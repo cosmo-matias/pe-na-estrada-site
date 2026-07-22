@@ -1,65 +1,97 @@
-import Image from "next/image";
+import Link from "next/link";
 
 export default function Home() {
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <main className="flex min-h-screen flex-col items-center justify-between">
+      {/* Hero Section */}
+      <section className="w-full bg-[var(--color-dark-base)] text-[var(--color-light-bg-white)] flex flex-col items-center justify-center py-20 px-6 min-h-[70vh]">
+        <div className="relative flex flex-col items-center justify-center mb-12">
+          {/* Simulação do Logotipo */}
+          <div className="text-center relative">
+            <span className="absolute -top-6 -left-6 text-3xl">🧢</span>
+            <span className="absolute top-0 -right-8 text-3xl">✌️</span>
+            
+            <p className="text-sm tracking-[0.3em] uppercase mb-2 font-sans font-semibold text-[var(--color-light-accent-blue)]">
+              Tour
+            </p>
+            <h1 className="font-[family-name:var(--font-caveat)] text-8xl md:text-9xl leading-none text-white drop-shadow-lg">
+              Pé
+            </h1>
+            <h2 className="font-[family-name:var(--font-caveat)] text-6xl md:text-7xl leading-tight text-white drop-shadow-md">
+              na Estrada
+            </h2>
+            
+            <span className="absolute bottom-4 -left-10 text-3xl">👋</span>
+            <span className="absolute -bottom-8 right-0 text-3xl">🦵</span>
+            <span className="absolute -bottom-10 right-8 text-3xl">🦵</span>
+          </div>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+
+        <button className="bg-[var(--color-primary-accent)] hover:bg-orange-500 text-white font-bold py-4 px-10 rounded-full text-xl transition-all shadow-lg hover:shadow-xl hover:-translate-y-1">
+          Ver Nossos Passeios
+        </button>
+      </section>
+
+      {/* Seção de Passeios */}
+      <section className="w-full bg-white text-[var(--color-dark-base)] py-20 px-6 flex flex-col items-center">
+        <h3 className="text-4xl font-bold mb-12">Passeios Disponíveis</h3>
+        
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 w-full max-w-6xl">
+          {/* Card 1 */}
+          <div className="bg-[var(--color-pale-peach)] rounded-3xl overflow-hidden shadow-md flex flex-col hover:shadow-xl transition-shadow cursor-pointer min-h-[400px]">
+            <div className="h-64 bg-black/5 w-full flex items-center justify-center">
+              <span className="text-black/30">Foto do Passeio</span>
+            </div>
+            <div className="p-8 flex-1 flex flex-col justify-between bg-[var(--color-light-bg-white)]">
+              <div>
+                <h4 className="text-2xl font-bold mb-2 text-[var(--color-medium-accent-blue)]">Passeio Placeholder</h4>
+                <p className="text-[var(--color-dark-base)]/80">Breve descrição do passeio será inserida aqui.</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Card 2 */}
+          <div className="bg-[var(--color-pale-peach)] rounded-3xl overflow-hidden shadow-md flex flex-col hover:shadow-xl transition-shadow cursor-pointer min-h-[400px]">
+            <div className="h-64 bg-black/5 w-full flex items-center justify-center">
+              <span className="text-black/30">Foto do Passeio</span>
+            </div>
+            <div className="p-8 flex-1 flex flex-col justify-between bg-[var(--color-light-bg-white)]">
+              <div>
+                <h4 className="text-2xl font-bold mb-2 text-[var(--color-medium-accent-blue)]">Passeio Placeholder</h4>
+                <p className="text-[var(--color-dark-base)]/80">Breve descrição do passeio será inserida aqui.</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Card 3 */}
+          <div className="bg-[var(--color-pale-peach)] rounded-3xl overflow-hidden shadow-md flex flex-col hover:shadow-xl transition-shadow cursor-pointer min-h-[400px]">
+            <div className="h-64 bg-black/5 w-full flex items-center justify-center">
+              <span className="text-black/30">Foto do Passeio</span>
+            </div>
+            <div className="p-8 flex-1 flex flex-col justify-between bg-[var(--color-light-bg-white)]">
+              <div>
+                <h4 className="text-2xl font-bold mb-2 text-[var(--color-medium-accent-blue)]">Passeio Placeholder</h4>
+                <p className="text-[var(--color-dark-base)]/80">Breve descrição do passeio será inserida aqui.</p>
+              </div>
+            </div>
+          </div>
         </div>
-      </main>
-    </div>
+      </section>
+
+      {/* Rodapé Minimalista */}
+      <footer className="w-full bg-[var(--color-dark-base)] py-8 flex flex-col items-center justify-center border-t border-[var(--color-medium-accent-blue)]/30">
+        <div className="flex gap-6 mb-4">
+          <Link href="#" className="text-[var(--color-light-bg-white)] hover:text-[var(--color-primary-accent)] transition-colors">
+            Instagram
+          </Link>
+          <Link href="#" className="text-[var(--color-light-bg-white)] hover:text-[var(--color-primary-accent)] transition-colors">
+            WhatsApp
+          </Link>
+        </div>
+        <p className="text-sm text-[var(--color-light-bg-white)]/60">
+          © {new Date().getFullYear()} Pé Na Estrada Tour. Todos os direitos reservados.
+        </p>
+      </footer>
+    </main>
   );
 }
