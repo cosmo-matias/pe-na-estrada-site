@@ -117,7 +117,7 @@ export default function Home() {
                   </div>
                   {/* Botão de Ação CTA */}
                   <a
-                    href={`https://wa.me/5500000000000?text=Olá! Gostaria de reservar o passeio para ${encodeURIComponent(passeio.titulo)}`}
+                    href={`https://wa.me/5583993620038?text=Olá! Gostaria de reservar o passeio para ${encodeURIComponent(passeio.titulo)}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="block w-full text-center bg-[var(--color-primary-accent)] hover:bg-orange-500 text-white font-bold py-3 px-4 rounded-xl transition-colors shadow-sm hover:shadow-md"

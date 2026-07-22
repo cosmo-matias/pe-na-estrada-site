@@ -3,9 +3,20 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { onAuthStateChanged, signOut, User } from "firebase/auth";
-import { collection, addDoc } from "firebase/firestore";
+import { collection, addDoc, getDocs, doc, updateDoc, deleteDoc } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { auth, db, storage } from "@/lib/firebaseConfig";
+
+interface Passeio {
+  id: string;
+  titulo: string;
+  data: string;
+  imagemUrl: string;
+  ativo: boolean;
+  preco?: number;
+  vagas?: number;
+  descricao?: string;
+}
 
 export default function AdminPage() {
   const [user, setUser] = useState<User | null>(null);
@@ -23,10 +34,31 @@ export default function AdminPage() {
   const [isSaving, setIsSaving] = useState(false);
   const [message, setMessage] = useState<{ text: string; type: "success" | "error" } | null>(null);
 
+  // List states
+  const [passeiosList, setPasseiosList] = useState<Passeio[]>([]);
+  const [isLoadingList, setIsLoadingList] = useState(true);
+
+  const fetchPasseios = async () => {
+    setIsLoadingList(true);
+    try {
+      const querySnapshot = await getDocs(collection(db, "passeios"));
+      const list: Passeio[] = [];
+      querySnapshot.forEach((docSnap) => {
+        list.push({ id: docSnap.id, ...docSnap.data() } as Passeio);
+      });
+      setPasseiosList(list);
+    } catch (error) {
+      console.error("Erro ao buscar passeios:", error);
+    } finally {
+      setIsLoadingList(false);
+    }
+  };
+
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       if (currentUser) {
         setUser(currentUser);
+        fetchPasseios();
         setLoading(false);
       } else {
         router.push("/login");
@@ -93,11 +125,39 @@ export default function AdminPage() {
       const fileInput = document.getElementById("imagem") as HTMLInputElement;
       if (fileInput) fileInput.value = "";
 
+      // Refresh list
+      fetchPasseios();
+
     } catch (error) {
       console.error("Erro ao cadastrar passeio:", error);
       setMessage({ text: "Ocorreu um erro ao cadastrar o passeio.", type: "error" });
     } finally {
       setIsSaving(false);
+    }
+  };
+
+  const handleToggleStatus = async (passeio: Passeio) => {
+    try {
+      const passeioRef = doc(db, "passeios", passeio.id);
+      await updateDoc(passeioRef, { ativo: !passeio.ativo });
+      // Update local state
+      setPasseiosList(prev => prev.map(p => p.id === passeio.id ? { ...p, ativo: !p.ativo } : p));
+    } catch (error) {
+      console.error("Erro ao alternar status:", error);
+      alert("Erro ao alterar o status do passeio.");
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    if (window.confirm("Tem certeza que deseja excluir este passeio?")) {
+      try {
+        await deleteDoc(doc(db, "passeios", id));
+        // Update local state
+        setPasseiosList(prev => prev.filter(p => p.id !== id));
+      } catch (error) {
+        console.error("Erro ao excluir passeio:", error);
+        alert("Erro ao excluir o passeio.");
+      }
     }
   };
 
@@ -112,8 +172,8 @@ export default function AdminPage() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col items-center bg-gray-50 p-8 md:p-12 text-[var(--color-dark-base)]">
-      <div className="w-full max-w-4xl bg-white rounded-3xl shadow-lg p-8 md:p-12 mb-8">
+    <div className="flex min-h-screen flex-col items-center bg-gray-50 p-4 md:p-12 text-[var(--color-dark-base)]">
+      <div className="w-full max-w-5xl bg-white rounded-3xl shadow-lg p-6 md:p-12 mb-8">
         <div className="flex flex-col md:flex-row justify-between items-center gap-6">
           <h1 className="text-3xl md:text-4xl font-bold text-[var(--color-medium-accent-blue)]">
             Painel de Controle
@@ -224,6 +284,66 @@ export default function AdminPage() {
               </div>
             )}
           </form>
+        </div>
+
+        {/* Linha separadora */}
+        <hr className="my-12 border-gray-200" />
+
+        {/* Lista de Passeios */}
+        <div>
+          <h2 className="text-2xl font-bold mb-6 text-[var(--color-dark-base)]">Passeios Cadastrados</h2>
+          
+          {isLoadingList ? (
+            <p className="text-gray-500">Carregando passeios...</p>
+          ) : passeiosList.length === 0 ? (
+            <p className="text-gray-500">Nenhum passeio cadastrado ainda.</p>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-left border-collapse">
+                <thead>
+                  <tr className="border-b border-gray-200 text-sm text-gray-500">
+                    <th className="pb-3 font-semibold">Imagem</th>
+                    <th className="pb-3 font-semibold">Título</th>
+                    <th className="pb-3 font-semibold">Data</th>
+                    <th className="pb-3 font-semibold">Status</th>
+                    <th className="pb-3 font-semibold text-right">Ações</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {passeiosList.map(passeio => (
+                    <tr key={passeio.id} className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
+                      <td className="py-4">
+                        <div className="w-16 h-12 bg-gray-200 rounded-md overflow-hidden relative shadow-sm">
+                          <img src={passeio.imagemUrl} alt="miniatura" className="object-cover w-full h-full" />
+                        </div>
+                      </td>
+                      <td className="py-4 font-medium text-[var(--color-dark-base)]">{passeio.titulo}</td>
+                      <td className="py-4 text-sm text-gray-600">{new Date(passeio.data + 'T00:00:00').toLocaleDateString('pt-BR')}</td>
+                      <td className="py-4">
+                        <span className={`px-3 py-1 rounded-full text-xs font-semibold ${passeio.ativo ? 'bg-green-100 text-green-700 border border-green-200' : 'bg-gray-200 text-gray-600 border border-gray-300'}`}>
+                          {passeio.ativo ? "Ativo" : "Inativo"}
+                        </span>
+                      </td>
+                      <td className="py-4 text-right space-x-2">
+                        <button
+                          onClick={() => handleToggleStatus(passeio)}
+                          className={`px-3 py-1.5 text-sm rounded-lg font-medium transition-colors ${passeio.ativo ? 'bg-yellow-100 text-yellow-700 hover:bg-yellow-200' : 'bg-[var(--color-medium-accent-blue)] text-white hover:bg-blue-700'}`}
+                        >
+                          {passeio.ativo ? "Desativar" : "Ativar"}
+                        </button>
+                        <button
+                          onClick={() => handleDelete(passeio.id)}
+                          className="px-3 py-1.5 bg-red-100 text-red-600 font-medium text-sm rounded-lg hover:bg-red-200 transition-colors"
+                        >
+                          Excluir
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
         </div>
       </div>
     </div>
