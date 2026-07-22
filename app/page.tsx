@@ -1,30 +1,20 @@
 import Link from "next/link";
+import Image from "next/image";
 
 export default function Home() {
   return (
     <main className="flex min-h-screen flex-col items-center justify-between">
       {/* Hero Section */}
       <section className="w-full bg-[var(--color-dark-base)] text-[var(--color-light-bg-white)] flex flex-col items-center justify-center py-20 px-6 min-h-[70vh]">
-        <div className="relative flex flex-col items-center justify-center mb-12">
-          {/* Simulação do Logotipo */}
-          <div className="text-center relative">
-            <span className="absolute -top-6 -left-6 text-3xl">🧢</span>
-            <span className="absolute top-0 -right-8 text-3xl">✌️</span>
-            
-            <p className="text-sm tracking-[0.3em] uppercase mb-2 font-sans font-semibold text-[var(--color-light-accent-blue)]">
-              Tour
-            </p>
-            <h1 className="font-[family-name:var(--font-caveat)] text-8xl md:text-9xl leading-none text-white drop-shadow-lg">
-              Pé
-            </h1>
-            <h2 className="font-[family-name:var(--font-caveat)] text-6xl md:text-7xl leading-tight text-white drop-shadow-md">
-              na Estrada
-            </h2>
-            
-            <span className="absolute bottom-4 -left-10 text-3xl">👋</span>
-            <span className="absolute -bottom-8 right-0 text-3xl">🦵</span>
-            <span className="absolute -bottom-10 right-8 text-3xl">🦵</span>
-          </div>
+        <div className="relative flex flex-col items-center justify-center mb-12 w-full max-w-md mx-auto">
+          <Image 
+            src="/logo.png" 
+            alt="Pé Na Estrada Tour Logo" 
+            width={500} 
+            height={500} 
+            className="w-full h-auto drop-shadow-2xl" 
+            priority
+          />
         </div>
 
         <button className="bg-[var(--color-primary-accent)] hover:bg-orange-500 text-white font-bold py-4 px-10 rounded-full text-xl transition-all shadow-lg hover:shadow-xl hover:-translate-y-1">
