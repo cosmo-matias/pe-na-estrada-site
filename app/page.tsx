@@ -1,7 +1,60 @@
+"use client";
+
 import Link from "next/link";
 import Image from "next/image";
+import { useEffect, useState } from "react";
+import { collection, query, where, getDocs } from "firebase/firestore";
+import { db } from "@/lib/firebaseConfig";
+
+// Definindo a interface para o Passeio
+interface Passeio {
+  id: string;
+  titulo: string;
+  descricao: string;
+  preco: number;
+  data: string;
+  vagas: number;
+  imagemUrl: string;
+  ativo: boolean;
+}
 
 export default function Home() {
+  const [passeios, setPasseios] = useState<Passeio[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchPasseios = async () => {
+      try {
+        const q = query(collection(db, "passeios"), where("ativo", "==", true));
+        const querySnapshot = await getDocs(q);
+        const fetchedPasseios: Passeio[] = [];
+        
+        querySnapshot.forEach((doc) => {
+          fetchedPasseios.push({ id: doc.id, ...doc.data() } as Passeio);
+        });
+        
+        setPasseios(fetchedPasseios);
+      } catch (error) {
+        console.error("Erro ao buscar passeios:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPasseios();
+  }, []);
+
+  // Formatador de preço
+  const formatPrice = (price: number) => {
+    return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(price);
+  };
+
+  // Formatador de data (ajustando a data para exibir corretamente)
+  const formatDate = (dateStr: string) => {
+    const date = new Date(dateStr + 'T00:00:00'); // Garante que a data local seja preservada
+    return new Intl.DateTimeFormat('pt-BR').format(date);
+  };
+
   return (
     <main className="flex min-h-screen flex-col items-center justify-between">
       {/* Hero Section */}
@@ -17,55 +70,65 @@ export default function Home() {
           />
         </div>
 
-        <button className="bg-[var(--color-primary-accent)] hover:bg-orange-500 text-white font-bold py-4 px-10 rounded-full text-xl transition-all shadow-lg hover:shadow-xl hover:-translate-y-1">
+        <a href="#passeios" className="bg-[var(--color-primary-accent)] hover:bg-orange-500 text-white font-bold py-4 px-10 rounded-full text-xl transition-all shadow-lg hover:shadow-xl hover:-translate-y-1">
           Ver Nossos Passeios
-        </button>
+        </a>
       </section>
 
       {/* Seção de Passeios */}
-      <section className="w-full bg-white text-[var(--color-dark-base)] py-20 px-6 flex flex-col items-center">
-        <h3 className="text-4xl font-bold mb-12">Passeios Disponíveis</h3>
+      <section id="passeios" className="w-full bg-white text-[var(--color-dark-base)] py-20 px-6 flex flex-col items-center min-h-[50vh]">
+        <h3 className="text-4xl font-bold mb-12 text-center text-[var(--color-medium-accent-blue)]">Passeios Disponíveis</h3>
         
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 w-full max-w-6xl">
-          {/* Card 1 */}
-          <div className="bg-[var(--color-pale-peach)] rounded-3xl overflow-hidden shadow-md flex flex-col hover:shadow-xl transition-shadow cursor-pointer min-h-[400px]">
-            <div className="h-64 bg-black/5 w-full flex items-center justify-center">
-              <span className="text-black/30">Foto do Passeio</span>
-            </div>
-            <div className="p-8 flex-1 flex flex-col justify-between bg-[var(--color-light-bg-white)]">
-              <div>
-                <h4 className="text-2xl font-bold mb-2 text-[var(--color-medium-accent-blue)]">Passeio Placeholder</h4>
-                <p className="text-[var(--color-dark-base)]/80">Breve descrição do passeio será inserida aqui.</p>
-              </div>
-            </div>
+        {loading ? (
+          <div className="flex flex-col items-center justify-center py-12">
+             <p className="text-xl font-medium animate-pulse text-[var(--color-dark-base)]">Carregando passeios...</p>
           </div>
-
-          {/* Card 2 */}
-          <div className="bg-[var(--color-pale-peach)] rounded-3xl overflow-hidden shadow-md flex flex-col hover:shadow-xl transition-shadow cursor-pointer min-h-[400px]">
-            <div className="h-64 bg-black/5 w-full flex items-center justify-center">
-              <span className="text-black/30">Foto do Passeio</span>
-            </div>
-            <div className="p-8 flex-1 flex flex-col justify-between bg-[var(--color-light-bg-white)]">
-              <div>
-                <h4 className="text-2xl font-bold mb-2 text-[var(--color-medium-accent-blue)]">Passeio Placeholder</h4>
-                <p className="text-[var(--color-dark-base)]/80">Breve descrição do passeio será inserida aqui.</p>
-              </div>
-            </div>
+        ) : passeios.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-12">
+             <p className="text-xl font-medium text-[var(--color-dark-base)]">Novos passeios em breve! Fique de olho.</p>
           </div>
-
-          {/* Card 3 */}
-          <div className="bg-[var(--color-pale-peach)] rounded-3xl overflow-hidden shadow-md flex flex-col hover:shadow-xl transition-shadow cursor-pointer min-h-[400px]">
-            <div className="h-64 bg-black/5 w-full flex items-center justify-center">
-              <span className="text-black/30">Foto do Passeio</span>
-            </div>
-            <div className="p-8 flex-1 flex flex-col justify-between bg-[var(--color-light-bg-white)]">
-              <div>
-                <h4 className="text-2xl font-bold mb-2 text-[var(--color-medium-accent-blue)]">Passeio Placeholder</h4>
-                <p className="text-[var(--color-dark-base)]/80">Breve descrição do passeio será inserida aqui.</p>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 w-full max-w-6xl">
+            {passeios.map((passeio) => (
+              <div key={passeio.id} className="bg-[var(--color-pale-peach)] rounded-3xl overflow-hidden shadow-md flex flex-col hover:shadow-xl transition-shadow min-h-[450px]">
+                {/* Imagem (usando tag img para evitar problemas de configuração de domínio remoto no next/image) */}
+                <div className="h-64 w-full relative bg-gray-100">
+                  <img 
+                    src={passeio.imagemUrl} 
+                    alt={`Foto de ${passeio.titulo}`}
+                    className="object-cover w-full h-full"
+                  />
+                </div>
+                {/* Conteúdo */}
+                <div className="p-8 flex-1 flex flex-col bg-[var(--color-light-bg-white)]">
+                  <div className="flex-1">
+                    <h4 className="text-2xl font-bold mb-3 text-[var(--color-medium-accent-blue)] line-clamp-2">
+                      {passeio.titulo}
+                    </h4>
+                    <div className="flex justify-between items-center mb-4">
+                      <span className="font-semibold text-lg text-[var(--color-dark-base)]">{formatPrice(passeio.preco)}</span>
+                      <span className="text-sm font-medium text-[var(--color-dark-base)] bg-[var(--color-pale-peach)]/50 px-3 py-1 rounded-full">
+                        {formatDate(passeio.data)}
+                      </span>
+                    </div>
+                    <p className="text-[var(--color-dark-base)]/80 line-clamp-3 mb-6">
+                      {passeio.descricao}
+                    </p>
+                  </div>
+                  {/* Botão de Ação CTA */}
+                  <a
+                    href={`https://wa.me/5500000000000?text=Olá! Gostaria de reservar o passeio para ${encodeURIComponent(passeio.titulo)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block w-full text-center bg-[var(--color-primary-accent)] hover:bg-orange-500 text-white font-bold py-3 px-4 rounded-xl transition-colors shadow-sm hover:shadow-md"
+                  >
+                    Reservar via WhatsApp
+                  </a>
+                </div>
               </div>
-            </div>
+            ))}
           </div>
-        </div>
+        )}
       </section>
 
       {/* Rodapé Minimalista */}
@@ -78,7 +141,7 @@ export default function Home() {
             WhatsApp
           </Link>
         </div>
-        <p className="text-sm text-[var(--color-light-bg-white)]/60">
+        <p className="text-sm text-[var(--color-light-bg-white)]/60 text-center">
           © {new Date().getFullYear()} Pé Na Estrada Tour. Todos os direitos reservados.
         </p>
       </footer>
