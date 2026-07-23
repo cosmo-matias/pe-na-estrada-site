@@ -22,6 +22,22 @@ export default function Home() {
   const [passeios, setPasseios] = useState<Passeio[]>([]);
   const [loading, setLoading] = useState(true);
 
+  // Estados para o slideshow
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const slides = [
+    '/slides/cabaceiras01.jpg',
+    '/slides/veneza01.jpg',
+    '/slides/veneza02.jpg',
+    '/slides/vilasitio.jpg'
+  ];
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % slides.length);
+    }, 5000);
+    return () => clearInterval(timer);
+  }, [slides.length]);
+
   useEffect(() => {
     const fetchPasseios = async () => {
       try {
@@ -58,8 +74,25 @@ export default function Home() {
   return (
     <main className="flex min-h-screen flex-col items-center justify-between">
       {/* Hero Section */}
-      <section className="w-full bg-[var(--color-dark-base)] text-[var(--color-light-bg-white)] flex flex-col items-center justify-center py-20 px-6 min-h-[70vh]">
-        <div className="relative flex flex-col items-center justify-center mb-12 w-full max-w-md mx-auto">
+      <section className="relative w-full bg-[var(--color-dark-base)] text-[var(--color-light-bg-white)] flex flex-col items-center justify-center py-20 px-6 min-h-[70vh] overflow-hidden">
+        
+        {/* Slideshow de Fundo */}
+        {slides.map((imgSrc, index) => (
+          <img
+            key={imgSrc}
+            src={imgSrc}
+            alt={`Slide ${index + 1}`}
+            className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ${
+              index === currentSlide ? "opacity-100" : "opacity-0"
+            }`}
+          />
+        ))}
+
+        {/* Overlay escuro para garantir leitura */}
+        <div className="absolute inset-0 bg-black/60 z-0"></div>
+
+        {/* Conteúdo (Logo e Botão) */}
+        <div className="relative z-10 flex flex-col items-center justify-center mb-12 w-full max-w-md mx-auto">
           <Image 
             src="/logo.png" 
             alt="Pé Na Estrada Tour Logo" 
@@ -70,7 +103,7 @@ export default function Home() {
           />
         </div>
 
-        <a href="#passeios" className="bg-[var(--color-primary-accent)] hover:bg-orange-500 text-white font-bold py-4 px-10 rounded-full text-xl transition-all shadow-lg hover:shadow-xl hover:-translate-y-1">
+        <a href="#passeios" className="relative z-10 bg-[var(--color-primary-accent)] hover:bg-orange-500 text-white font-bold py-4 px-10 rounded-full text-xl transition-all shadow-lg hover:shadow-xl hover:-translate-y-1">
           Ver Nossos Passeios
         </a>
       </section>
