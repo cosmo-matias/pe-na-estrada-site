@@ -4,8 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { onAuthStateChanged, signOut, User } from "firebase/auth";
 import { collection, addDoc, getDocs, doc, updateDoc, deleteDoc } from "firebase/firestore";
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { auth, db, storage } from "@/lib/firebaseConfig";
+import { auth, db } from "@/lib/firebaseConfig";
 
 interface Passeio {
   id: string;
@@ -94,12 +93,23 @@ export default function AdminPage() {
     setMessage(null);
 
     try {
-      // 1. Upload the image
-      const imageRef = ref(storage, `passeios/${Date.now()}_${imagem.name}`);
-      const snapshot = await uploadBytes(imageRef, imagem);
+      // 1. Upload the image to ImgBB
+      const formData = new FormData();
+      formData.append("image", imagem);
+
+      const imgbbResponse = await fetch(`https://api.imgbb.com/1/upload?key=${process.env.NEXT_PUBLIC_IMGBB_API_KEY}`, {
+        method: "POST",
+        body: formData,
+      });
+      
+      const imgbbData = await imgbbResponse.json();
+
+      if (!imgbbResponse.ok || !imgbbData.success) {
+        throw new Error(imgbbData.error?.message || "Falha ao enviar imagem para o ImgBB");
+      }
       
       // 2. Get the public URL
-      const imagemUrl = await getDownloadURL(snapshot.ref);
+      const imagemUrl = imgbbData.data.url;
 
       // 3. Save to Firestore
       await addDoc(collection(db, "passeios"), {
