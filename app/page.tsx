@@ -25,14 +25,15 @@ export default function Home() {
 
   // Estados para o slideshow
   const [currentSlide, setCurrentSlide] = useState(0);
-  const slides = [
+  const [slides, setSlides] = useState<string[]>([
     '/slides/cabaceiras01.jpg',
     '/slides/veneza01.jpg',
     '/slides/veneza02.jpg',
     '/slides/vilasitio.jpg'
-  ];
+  ]);
 
   useEffect(() => {
+    if (slides.length === 0) return;
     const timer = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % slides.length);
     }, 5000);
@@ -40,25 +41,35 @@ export default function Home() {
   }, [slides.length]);
 
   useEffect(() => {
-    const fetchPasseios = async () => {
+    const fetchData = async () => {
       try {
-        const q = query(collection(db, "passeios"), where("ativo", "==", true));
-        const querySnapshot = await getDocs(q);
+        // Fetch Passeios
+        const qPasseios = query(collection(db, "passeios"), where("ativo", "==", true));
+        const querySnapshotPasseios = await getDocs(qPasseios);
         const fetchedPasseios: Passeio[] = [];
-        
-        querySnapshot.forEach((doc) => {
+        querySnapshotPasseios.forEach((doc) => {
           fetchedPasseios.push({ id: doc.id, ...doc.data() } as Passeio);
         });
-        
         setPasseios(fetchedPasseios);
+
+        // Fetch Slides
+        const querySnapshotSlides = await getDocs(collection(db, "slides"));
+        const fetchedSlides: string[] = [];
+        querySnapshotSlides.forEach((doc) => {
+          fetchedSlides.push(doc.data().imagemUrl);
+        });
+        
+        if (fetchedSlides.length > 0) {
+          setSlides(fetchedSlides);
+        }
       } catch (error) {
-        console.error("Erro ao buscar passeios:", error);
+        console.error("Erro ao buscar dados:", error);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchPasseios();
+    fetchData();
   }, []);
 
   // Formatador de preço

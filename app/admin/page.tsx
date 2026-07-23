@@ -32,10 +32,18 @@ export default function AdminPage() {
   
   const [isSaving, setIsSaving] = useState(false);
   const [message, setMessage] = useState<{ text: string; type: "success" | "error" } | null>(null);
+  
+  const [passeioEmEdicao, setPasseioEmEdicao] = useState<Passeio | null>(null);
 
   // List states
   const [passeiosList, setPasseiosList] = useState<Passeio[]>([]);
   const [isLoadingList, setIsLoadingList] = useState(true);
+
+  // Slideshow states
+  const [slidesList, setSlidesList] = useState<any[]>([]);
+  const [slideImagem, setSlideImagem] = useState<File | null>(null);
+  const [isSavingSlide, setIsSavingSlide] = useState(false);
+  const [slideMessage, setSlideMessage] = useState<{ text: string; type: "success" | "error" } | null>(null);
 
   const fetchPasseios = async () => {
     setIsLoadingList(true);
@@ -53,11 +61,25 @@ export default function AdminPage() {
     }
   };
 
+  const fetchSlides = async () => {
+    try {
+      const querySnapshot = await getDocs(collection(db, "slides"));
+      const list: any[] = [];
+      querySnapshot.forEach((docSnap) => {
+        list.push({ id: docSnap.id, ...docSnap.data() });
+      });
+      setSlidesList(list);
+    } catch (error) {
+      console.error("Erro ao buscar slides:", error);
+    }
+  };
+
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       if (currentUser) {
         setUser(currentUser);
         fetchPasseios();
+        fetchSlides();
         setLoading(false);
       } else {
         router.push("/login");
@@ -82,9 +104,33 @@ export default function AdminPage() {
     }
   };
 
+  const handleEdit = (passeio: Passeio) => {
+    setPasseioEmEdicao(passeio);
+    setTitulo(passeio.titulo);
+    setDescricao(passeio.descricao || "");
+    setPreco(passeio.preco?.toString() || "");
+    setData(passeio.data);
+    setVagas(passeio.vagas?.toString() || "");
+    setImagem(null);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleCancelEdit = () => {
+    setPasseioEmEdicao(null);
+    setTitulo("");
+    setDescricao("");
+    setPreco("");
+    setData("");
+    setVagas("");
+    setImagem(null);
+    const fileInput = document.getElementById("imagem") as HTMLInputElement;
+    if (fileInput) fileInput.value = "";
+    setMessage(null);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!imagem) {
+    if (!passeioEmEdicao && !imagem) {
       setMessage({ text: "Por favor, selecione uma imagem.", type: "error" });
       return;
     }
@@ -93,54 +139,60 @@ export default function AdminPage() {
     setMessage(null);
 
     try {
-      // 1. Upload the image to ImgBB
-      const formData = new FormData();
-      formData.append("image", imagem);
+      let imagemUrl = passeioEmEdicao?.imagemUrl || "";
 
-      const imgbbResponse = await fetch(`https://api.imgbb.com/1/upload?key=${process.env.NEXT_PUBLIC_IMGBB_API_KEY}`, {
-        method: "POST",
-        body: formData,
-      });
-      
-      const imgbbData = await imgbbResponse.json();
+      // 1. Upload the image to ImgBB if a new one was selected
+      if (imagem) {
+        const formData = new FormData();
+        formData.append("image", imagem);
 
-      if (!imgbbResponse.ok || !imgbbData.success) {
-        throw new Error(imgbbData.error?.message || "Falha ao enviar imagem para o ImgBB");
+        const imgbbResponse = await fetch(`https://api.imgbb.com/1/upload?key=${process.env.NEXT_PUBLIC_IMGBB_API_KEY}`, {
+          method: "POST",
+          body: formData,
+        });
+        
+        const imgbbData = await imgbbResponse.json();
+
+        if (!imgbbResponse.ok || !imgbbData.success) {
+          throw new Error(imgbbData.error?.message || "Falha ao enviar imagem para o ImgBB");
+        }
+        
+        imagemUrl = imgbbData.data.url;
       }
-      
-      // 2. Get the public URL
-      const imagemUrl = imgbbData.data.url;
 
-      // 3. Save to Firestore
-      await addDoc(collection(db, "passeios"), {
-        titulo,
-        descricao,
-        preco: Number(preco),
-        data,
-        vagas: Number(vagas),
-        imagemUrl,
-        ativo: true,
-        createdAt: new Date().toISOString()
-      });
+      // 2. Save to Firestore
+      if (passeioEmEdicao) {
+        const passeioRef = doc(db, "passeios", passeioEmEdicao.id);
+        await updateDoc(passeioRef, {
+          titulo,
+          descricao,
+          preco: Number(preco),
+          data,
+          vagas: Number(vagas),
+          imagemUrl
+        });
+        setMessage({ text: "Passeio atualizado com sucesso!", type: "success" });
+      } else {
+        await addDoc(collection(db, "passeios"), {
+          titulo,
+          descricao,
+          preco: Number(preco),
+          data,
+          vagas: Number(vagas),
+          imagemUrl,
+          ativo: true,
+          createdAt: new Date().toISOString()
+        });
+        setMessage({ text: "Passeio cadastrado com sucesso!", type: "success" });
+      }
 
-      // 4. Show success and reset form
-      setMessage({ text: "Passeio cadastrado com sucesso!", type: "success" });
-      setTitulo("");
-      setDescricao("");
-      setPreco("");
-      setData("");
-      setVagas("");
-      setImagem(null);
-      // Reset input file type
-      const fileInput = document.getElementById("imagem") as HTMLInputElement;
-      if (fileInput) fileInput.value = "";
-
-      // Refresh list
+      // 3. Reset form
+      handleCancelEdit();
       fetchPasseios();
 
     } catch (error) {
-      console.error("Erro ao cadastrar passeio:", error);
-      setMessage({ text: "Ocorreu um erro ao cadastrar o passeio.", type: "error" });
+      console.error("Erro ao salvar passeio:", error);
+      setMessage({ text: "Ocorreu um erro ao salvar o passeio.", type: "error" });
     } finally {
       setIsSaving(false);
     }
@@ -203,7 +255,9 @@ export default function AdminPage() {
 
         {/* Formulário de Cadastro de Passeios */}
         <div className="mt-10">
-          <h2 className="text-2xl font-bold mb-6 text-[var(--color-dark-base)]">Cadastrar Novo Passeio</h2>
+          <h2 className="text-2xl font-bold mb-6 text-[var(--color-dark-base)]">
+            {passeioEmEdicao ? "Editar Passeio" : "Cadastrar Novo Passeio"}
+          </h2>
           
           <form onSubmit={handleSubmit} className="bg-[var(--color-light-bg-white)] p-6 rounded-2xl shadow-sm flex flex-col gap-5">
             <div>
@@ -269,24 +323,38 @@ export default function AdminPage() {
             </div>
 
             <div>
-              <label className="block font-medium mb-1" htmlFor="imagem">Imagem</label>
+              <label className="block font-medium mb-1" htmlFor="imagem">
+                {passeioEmEdicao ? "Nova Imagem (deixe em branco para manter a atual)" : "Imagem"}
+              </label>
               <input
                 id="imagem"
                 type="file"
                 accept="image/*"
                 onChange={handleFileChange}
                 className="w-full px-4 py-2 rounded-xl border border-gray-300 bg-white"
-                required
+                required={!passeioEmEdicao}
               />
             </div>
 
-            <button
-              type="submit"
-              disabled={isSaving}
-              className="mt-4 bg-[var(--color-primary-accent)] hover:bg-orange-500 text-white font-bold py-3 px-6 rounded-xl transition-all shadow-md hover:shadow-lg disabled:opacity-50"
-            >
-              {isSaving ? "Salvando..." : "Salvar Passeio"}
-            </button>
+            <div className="mt-4 flex gap-4">
+              <button
+                type="submit"
+                disabled={isSaving}
+                className="flex-1 bg-[var(--color-primary-accent)] hover:bg-orange-500 text-white font-bold py-3 px-6 rounded-xl transition-all shadow-md hover:shadow-lg disabled:opacity-50"
+              >
+                {isSaving ? "Salvando..." : (passeioEmEdicao ? "Atualizar Passeio" : "Salvar Passeio")}
+              </button>
+              {passeioEmEdicao && (
+                <button
+                  type="button"
+                  onClick={handleCancelEdit}
+                  disabled={isSaving}
+                  className="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold py-3 px-6 rounded-xl transition-all shadow-md disabled:opacity-50"
+                >
+                  Cancelar Edição
+                </button>
+              )}
+            </div>
 
             {message && (
               <div className={`p-4 rounded-xl mt-2 font-medium text-center ${message.type === 'success' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
@@ -334,7 +402,13 @@ export default function AdminPage() {
                           {passeio.ativo ? "Ativo" : "Inativo"}
                         </span>
                       </td>
-                      <td className="py-4 text-right space-x-2">
+                      <td className="py-4 text-right space-x-2 flex justify-end">
+                        <button
+                          onClick={() => handleEdit(passeio)}
+                          className="px-3 py-1.5 bg-blue-100 text-blue-700 font-medium text-sm rounded-lg hover:bg-blue-200 transition-colors"
+                        >
+                          Editar
+                        </button>
                         <button
                           onClick={() => handleToggleStatus(passeio)}
                           className={`px-3 py-1.5 text-sm rounded-lg font-medium transition-colors ${passeio.ativo ? 'bg-yellow-100 text-yellow-700 hover:bg-yellow-200' : 'bg-[var(--color-medium-accent-blue)] text-white hover:bg-blue-700'}`}
@@ -355,6 +429,113 @@ export default function AdminPage() {
             </div>
           )}
         </div>
+        {/* Linha separadora */}
+        <hr className="my-12 border-gray-200" />
+
+        {/* Seção Gerenciar Slideshow */}
+        <div>
+          <h2 className="text-2xl font-bold mb-6 text-[var(--color-dark-base)]">Gerenciar Slideshow da Capa</h2>
+          
+          <form 
+            onSubmit={async (e) => {
+              e.preventDefault();
+              if (!slideImagem) return;
+              setIsSavingSlide(true);
+              setSlideMessage(null);
+              
+              try {
+                const formData = new FormData();
+                formData.append("image", slideImagem);
+                const imgbbResponse = await fetch(`https://api.imgbb.com/1/upload?key=${process.env.NEXT_PUBLIC_IMGBB_API_KEY}`, {
+                  method: "POST",
+                  body: formData,
+                });
+                const imgbbData = await imgbbResponse.json();
+                
+                if (!imgbbResponse.ok || !imgbbData.success) {
+                  throw new Error("Falha ao enviar imagem");
+                }
+                
+                await addDoc(collection(db, "slides"), {
+                  imagemUrl: imgbbData.data.url,
+                  dataAdicao: new Date().toISOString()
+                });
+                
+                setSlideMessage({ text: "Slide adicionado com sucesso!", type: "success" });
+                setSlideImagem(null);
+                const fileInput = document.getElementById("slideImagem") as HTMLInputElement;
+                if (fileInput) fileInput.value = "";
+                fetchSlides();
+              } catch (error) {
+                console.error(error);
+                setSlideMessage({ text: "Erro ao adicionar slide.", type: "error" });
+              } finally {
+                setIsSavingSlide(false);
+              }
+            }}
+            className="bg-gray-100 p-6 rounded-2xl mb-8 flex flex-col md:flex-row items-center gap-4"
+          >
+            <div className="flex-1 w-full">
+              <label className="block font-medium mb-1 text-sm" htmlFor="slideImagem">Nova Imagem para Slideshow</label>
+              <input
+                id="slideImagem"
+                type="file"
+                accept="image/*"
+                onChange={(e) => {
+                  if (e.target.files && e.target.files[0]) {
+                    setSlideImagem(e.target.files[0]);
+                  }
+                }}
+                className="w-full px-4 py-2 rounded-xl border border-gray-300 bg-white"
+                required
+              />
+            </div>
+            <button
+              type="submit"
+              disabled={isSavingSlide || !slideImagem}
+              className="mt-6 w-full md:w-auto bg-[var(--color-medium-accent-blue)] hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-xl transition-all disabled:opacity-50"
+            >
+              {isSavingSlide ? "Enviando..." : "Adicionar Slide"}
+            </button>
+          </form>
+
+          {slideMessage && (
+            <div className={`p-4 rounded-xl mb-6 font-medium text-center ${slideMessage.type === 'success' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+              {slideMessage.text}
+            </div>
+          )}
+
+          <div className="flex flex-wrap gap-4">
+            {slidesList.length === 0 ? (
+              <p className="text-gray-500">Nenhum slide cadastrado. As imagens padrão estão sendo exibidas.</p>
+            ) : (
+              slidesList.map((slide) => (
+                <div key={slide.id} className="relative w-48 h-32 rounded-xl overflow-hidden shadow-md group">
+                  <img src={slide.imagemUrl} alt="Slide" className="object-cover w-full h-full" />
+                  <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
+                    <button 
+                      onClick={async () => {
+                        if (window.confirm("Excluir este slide?")) {
+                          try {
+                            await deleteDoc(doc(db, "slides", slide.id));
+                            fetchSlides();
+                          } catch (error) {
+                            console.error(error);
+                            alert("Erro ao excluir");
+                          }
+                        }
+                      }}
+                      className="bg-red-500 text-white font-bold py-1 px-3 rounded-lg hover:bg-red-600"
+                    >
+                      Remover
+                    </button>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+
       </div>
     </div>
   );
