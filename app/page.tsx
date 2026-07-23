@@ -21,6 +21,7 @@ interface Passeio {
 export default function Home() {
   const [passeios, setPasseios] = useState<Passeio[]>([]);
   const [loading, setLoading] = useState(true);
+  const [passeioSelecionado, setPasseioSelecionado] = useState<Passeio | null>(null);
 
   // Estados para o slideshow
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -125,17 +126,23 @@ export default function Home() {
             {passeios.map((passeio) => (
               <div key={passeio.id} className="bg-[var(--color-pale-peach)] rounded-3xl overflow-hidden shadow-md flex flex-col hover:shadow-xl transition-shadow min-h-[450px]">
                 {/* Imagem (usando tag img para evitar problemas de configuração de domínio remoto no next/image) */}
-                <div className="h-64 w-full relative bg-gray-100">
+                <div 
+                  className="h-64 w-full relative bg-gray-100 cursor-pointer overflow-hidden"
+                  onClick={() => setPasseioSelecionado(passeio)}
+                >
                   <img 
                     src={passeio.imagemUrl} 
                     alt={`Foto de ${passeio.titulo}`}
-                    className="object-cover w-full h-full"
+                    className="object-cover w-full h-full hover:scale-105 transition-transform duration-500"
                   />
                 </div>
                 {/* Conteúdo */}
                 <div className="p-8 flex-1 flex flex-col bg-[var(--color-light-bg-white)]">
                   <div className="flex-1">
-                    <h4 className="text-2xl font-bold mb-3 text-[var(--color-medium-accent-blue)] line-clamp-2">
+                    <h4 
+                      className="text-2xl font-bold mb-3 text-[var(--color-medium-accent-blue)] line-clamp-2 cursor-pointer hover:text-[var(--color-primary-accent)] transition-colors"
+                      onClick={() => setPasseioSelecionado(passeio)}
+                    >
                       {passeio.titulo}
                     </h4>
                     <div className="flex justify-between items-center mb-4">
@@ -144,13 +151,19 @@ export default function Home() {
                         {formatDate(passeio.data)}
                       </span>
                     </div>
-                    <p className="text-[var(--color-dark-base)]/80 line-clamp-3 mb-6">
+                    <p className="text-[var(--color-dark-base)]/80 line-clamp-3 mb-2">
                       {passeio.descricao}
                     </p>
+                    <button 
+                      onClick={() => setPasseioSelecionado(passeio)}
+                      className="text-[var(--color-primary-accent)] font-bold text-sm mb-6 hover:underline focus:outline-none"
+                    >
+                      Ler mais
+                    </button>
                   </div>
                   {/* Botão de Ação CTA */}
                   <a
-                    href={`https://wa.me/5588993620038?text=Olá! Gostaria de reservar o passeio para ${encodeURIComponent(passeio.titulo)}`}
+                    href={`https://wa.me/5583993630038?text=Olá! Gostaria de reservar o passeio para ${encodeURIComponent(passeio.titulo)}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="block w-full text-center bg-[var(--color-primary-accent)] hover:bg-orange-500 text-white font-bold py-3 px-4 rounded-xl transition-colors shadow-sm hover:shadow-md"
@@ -170,7 +183,7 @@ export default function Home() {
           <Link href="https://instagram.com/penaestradatour7" target="_blank" rel="noopener noreferrer" className="text-[var(--color-light-bg-white)] hover:text-[var(--color-primary-accent)] transition-colors">
             Instagram
           </Link>
-          <Link href="https://wa.me/5588993620038" target="_blank" rel="noopener noreferrer" className="text-[var(--color-light-bg-white)] hover:text-[var(--color-primary-accent)] transition-colors">
+          <Link href="https://wa.me/5583993630038" target="_blank" rel="noopener noreferrer" className="text-[var(--color-light-bg-white)] hover:text-[var(--color-primary-accent)] transition-colors">
             WhatsApp
           </Link>
         </div>
@@ -178,6 +191,68 @@ export default function Home() {
           © {new Date().getFullYear()} Pé Na Estrada Tour. Todos os direitos reservados.
         </p>
       </footer>
+
+      {/* Modal de Detalhes do Passeio */}
+      {passeioSelecionado && (
+        <div 
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4"
+          onClick={() => setPasseioSelecionado(null)}
+        >
+          <div 
+            className="bg-[var(--color-light-bg-white)] rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto relative shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Botão Fechar */}
+            <button 
+              onClick={() => setPasseioSelecionado(null)}
+              className="absolute top-4 right-4 bg-black/50 hover:bg-black/80 text-white rounded-full w-8 h-8 flex items-center justify-center transition-colors z-10"
+            >
+              ✕
+            </button>
+            
+            {/* Imagem do Passeio */}
+            <div className="w-full h-64 sm:h-80 relative bg-gray-200 rounded-t-2xl overflow-hidden">
+              <img 
+                src={passeioSelecionado.imagemUrl} 
+                alt={passeioSelecionado.titulo} 
+                className="w-full h-full object-cover"
+              />
+            </div>
+            
+            {/* Conteúdo do Modal */}
+            <div className="p-8">
+              <h3 className="text-3xl font-bold mb-4 text-[var(--color-medium-accent-blue)]">
+                {passeioSelecionado.titulo}
+              </h3>
+              
+              <div className="flex flex-wrap gap-4 mb-6">
+                <span className="font-bold text-xl text-[var(--color-dark-base)]">
+                  {formatPrice(passeioSelecionado.preco)}
+                </span>
+                <span className="font-medium text-[var(--color-dark-base)] bg-[var(--color-pale-peach)] px-4 py-1 rounded-full flex items-center">
+                  📅 {formatDate(passeioSelecionado.data)}
+                </span>
+                <span className="font-medium text-[var(--color-dark-base)] bg-[var(--color-pale-peach)] px-4 py-1 rounded-full flex items-center">
+                  👥 {passeioSelecionado.vagas} {passeioSelecionado.vagas === 1 ? 'vaga' : 'vagas'}
+                </span>
+              </div>
+              
+              <div className="mb-8 text-[var(--color-dark-base)]/90 whitespace-pre-wrap leading-relaxed">
+                {passeioSelecionado.descricao}
+              </div>
+              
+              <a
+                href={`https://wa.me/5583993630038?text=Olá! Gostaria de reservar o passeio para ${encodeURIComponent(passeioSelecionado.titulo)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block w-full text-center bg-[var(--color-primary-accent)] hover:bg-orange-500 text-white font-bold py-4 px-6 rounded-xl transition-all shadow-md hover:shadow-lg text-lg hover:-translate-y-1"
+              >
+                Reservar via WhatsApp
+              </a>
+            </div>
+          </div>
+        </div>
+      )}
     </main>
   );
 }
