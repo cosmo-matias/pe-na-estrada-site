@@ -163,7 +163,7 @@ export default function Home() {
                   </div>
                   {/* Botão de Ação CTA */}
                   <a
-                    href={`https://wa.me/5583993630038?text=Olá! Gostaria de reservar o passeio para ${encodeURIComponent(passeio.titulo)}`}
+                    href={`https://wa.me/5583993620038?text=Olá! Gostaria de reservar o passeio para ${encodeURIComponent(passeio.titulo)}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="block w-full text-center bg-[var(--color-primary-accent)] hover:bg-orange-500 text-white font-bold py-3 px-4 rounded-xl transition-colors shadow-sm hover:shadow-md"
@@ -183,7 +183,7 @@ export default function Home() {
           <Link href="https://instagram.com/penaestradatour7" target="_blank" rel="noopener noreferrer" className="text-[var(--color-light-bg-white)] hover:text-[var(--color-primary-accent)] transition-colors">
             Instagram
           </Link>
-          <Link href="https://wa.me/5583993630038" target="_blank" rel="noopener noreferrer" className="text-[var(--color-light-bg-white)] hover:text-[var(--color-primary-accent)] transition-colors">
+          <Link href="https://wa.me/5583993620038" target="_blank" rel="noopener noreferrer" className="text-[var(--color-light-bg-white)] hover:text-[var(--color-primary-accent)] transition-colors">
             WhatsApp
           </Link>
         </div>
@@ -242,7 +242,7 @@ export default function Home() {
               </div>
               
               <a
-                href={`https://wa.me/5583993630038?text=Olá! Gostaria de reservar o passeio para ${encodeURIComponent(passeioSelecionado.titulo)}`}
+                href={`https://wa.me/5583993620038?text=Olá! Gostaria de reservar o passeio para ${encodeURIComponent(passeioSelecionado.titulo)}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="block w-full text-center bg-[var(--color-primary-accent)] hover:bg-orange-500 text-white font-bold py-4 px-6 rounded-xl transition-all shadow-md hover:shadow-lg text-lg hover:-translate-y-1"
