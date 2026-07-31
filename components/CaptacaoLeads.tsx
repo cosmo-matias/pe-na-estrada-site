@@ -14,6 +14,22 @@ export default function CaptacaoLeads() {
     setWhatsapp('');
   };
 
+  const formatarWhatsApp = (valor: string) => {
+    // Remove tudo que não for número
+    let num = valor.replace(/\D/g, "");
+    
+    // Limita a 11 números
+    if (num.length > 11) {
+      num = num.slice(0, 11);
+    }
+
+    // Aplica a máscara
+    if (num.length === 0) return "";
+    if (num.length <= 2) return `(${num}`;
+    if (num.length <= 7) return `(${num.slice(0, 2)}) ${num.slice(2)}`;
+    return `(${num.slice(0, 2)}) ${num.slice(2, 7)}-${num.slice(7)}`;
+  };
+
   return (
     <section className="w-full bg-[var(--color-primary-accent)] py-16 px-6">
       <div className="max-w-4xl mx-auto text-center">
@@ -63,8 +79,9 @@ export default function CaptacaoLeads() {
                 type="tel" 
                 placeholder="Seu WhatsApp" 
                 required
+                maxLength={15}
                 value={whatsapp}
-                onChange={(e) => setWhatsapp(e.target.value)}
+                onChange={(e) => setWhatsapp(formatarWhatsApp(e.target.value))}
                 className="w-full md:w-1/3 px-4 py-3 rounded-xl border-none text-gray-900 focus:outline-none focus:ring-2 focus:ring-orange-300"
               />
               <button 
