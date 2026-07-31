@@ -9,7 +9,7 @@ export default function Footer() {
         <div className="flex flex-col gap-4">
           <h4 className="text-xl font-bold text-white">Pé Na Estrada Tour</h4>
           <p className="text-slate-400">Sua melhor experiência de viagem começa aqui.</p>
-          <p className="text-sm text-slate-500 mt-2">CNPJ: XX.XXX.XXX/0001-XX</p>
+          <p className="text-sm text-slate-500 mt-2">CNPJ / Cadastur: 59.101.202/0001-72</p>
         </div>
 
         {/* Coluna 2 */}
@@ -19,8 +19,8 @@ export default function Footer() {
             <a href="https://wa.me/5583993620038" target="_blank" rel="noopener noreferrer" className="hover:text-[var(--color-primary-accent)] transition-colors">
               WhatsApp: +55 83 99362-0038
             </a>
-            <a href="mailto:contato@penaestradatour.com.br" className="hover:text-[var(--color-primary-accent)] transition-colors">
-              E-mail de Contato
+            <a href="mailto:penaestradatour7@gmail.com" className="hover:text-[var(--color-primary-accent)] transition-colors">
+              penaestradatour7@gmail.com
             </a>
             <a href="https://instagram.com/penaestradatour7" target="_blank" rel="noopener noreferrer" className="hover:text-[var(--color-primary-accent)] transition-colors">
               Instagram: @penaestradatour7
