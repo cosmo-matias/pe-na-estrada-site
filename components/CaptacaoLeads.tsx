@@ -1,17 +1,30 @@
 "use client";
 
 import React, { useState } from 'react';
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { db } from '@/lib/firebaseConfig';
 
 export default function CaptacaoLeads() {
   const [nome, setNome] = useState('');
   const [whatsapp, setWhatsapp] = useState('');
   const [status, setStatus] = useState<'idle' | 'success'>('idle');
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setStatus('success');
-    setNome('');
-    setWhatsapp('');
+    try {
+      await addDoc(collection(db, 'leads'), {
+        nome: nome,
+        whatsapp: whatsapp,
+        origem: 'Site Público',
+        dataCadastro: serverTimestamp()
+      });
+      setStatus('success');
+      setNome('');
+      setWhatsapp('');
+    } catch (error) {
+      console.error("Erro ao salvar lead no Firestore:", error);
+      alert("Houve um erro ao processar seu cadastro. Por favor, tente novamente.");
+    }
   };
 
   const formatarWhatsApp = (valor: string) => {
