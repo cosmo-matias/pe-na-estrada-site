@@ -1,17 +1,12 @@
 import React from 'react';
 
-export default function ChecklistPasseio() {
-  const inclusos = [
-    "Transporte Executivo Padrão Turismo",
-    "Guia de Turismo Credenciado",
-    "Ingresso/Pulseira de Acesso"
-  ];
+interface ChecklistPasseioProps {
+  inclusos: string[];
+  naoInclusos: string[];
+}
 
-  const naoInclusos = [
-    "Alimentação (Café/Almoço)",
-    "Despesas de caráter pessoal",
-    "Passeios opcionais no local"
-  ];
+export default function ChecklistPasseio({ inclusos = [], naoInclusos = [] }: ChecklistPasseioProps) {
+  if (inclusos.length === 0 && naoInclusos.length === 0) return null;
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8 mb-8 p-6 bg-gray-50 rounded-xl border border-gray-100">

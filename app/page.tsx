@@ -23,6 +23,9 @@ interface Passeio {
   vagas: number;
   imagemUrl: string;
   ativo: boolean;
+  inclusos?: string[];
+  naoInclusos?: string[];
+  roteiro?: { horario: string; evento: string }[];
 }
 
 export default function Home() {
@@ -308,17 +311,21 @@ export default function Home() {
                 {passeioSelecionado.descricao}
               </div>
 
-              <ChecklistPasseio />
+              {(passeioSelecionado.inclusos?.length || 0) > 0 || (passeioSelecionado.naoInclusos?.length || 0) > 0 ? (
+                <ChecklistPasseio 
+                  inclusos={passeioSelecionado.inclusos || []} 
+                  naoInclusos={passeioSelecionado.naoInclusos || []} 
+                />
+              ) : null}
 
-              <h4 className="text-lg font-bold text-gray-800 mt-6 mb-4">Programação do Dia</h4>
-              <div className="mb-8">
-                <TimelineRoteiro roteiro={[
-                  { horario: '05:00', evento: 'Embarque Principal' },
-                  { horario: '08:30', evento: 'Parada para Café da Manhã' },
-                  { horario: '09:30', evento: 'Chegada ao Destino e Início dos Passeios' },
-                  { horario: '16:00', evento: 'Retorno' }
-                ]} />
-              </div>
+              {(passeioSelecionado.roteiro?.length || 0) > 0 ? (
+                <>
+                  <h4 className="text-lg font-bold text-gray-800 mt-6 mb-4">Programação do Dia</h4>
+                  <div className="mb-8">
+                    <TimelineRoteiro roteiro={passeioSelecionado.roteiro || []} />
+                  </div>
+                </>
+              ) : null}
               
               <a
                 href={`https://wa.me/5583993620038?text=Olá! Gostaria de reservar o passeio para ${encodeURIComponent(passeioSelecionado.titulo)}`}
