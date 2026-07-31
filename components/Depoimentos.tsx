@@ -1,25 +1,14 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { collection, query, where, getDocs, orderBy } from 'firebase/firestore';
+import { db } from '@/lib/firebaseConfig';
+import FormularioDepoimento from './FormularioDepoimento';
 
-const depoimentos = [
-  {
-    id: 1,
-    nome: 'Mariana Silva',
-    texto: 'Foi uma experiência incrível! A van era super confortável e pontualíssima. Além de tudo, o guia conhecia cada detalhe da história local. Recomendo de olhos fechados!',
-    estrelas: 5
-  },
-  {
-    id: 2,
-    nome: 'Carlos Eduardo',
-    texto: 'O roteiro foi montado de forma impecável, com tempo de sobra para aproveitar as paradas sem aquela correria de sempre. Serviço extremamente organizado e atencioso.',
-    estrelas: 5
-  },
-  {
-    id: 3,
-    nome: 'Fernanda Costa',
-    texto: 'Excelente custo-benefício! Fizemos o passeio para Cabaceiras e foi espetacular. Todo o suporte no WhatsApp antes da viagem me deixou super segura.',
-    estrelas: 5
-  }
-];
+interface Depoimento {
+  id: string;
+  nome: string;
+  texto: string;
+  estrelas: number;
+}
 
 const StarIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-yellow-400 fill-current" viewBox="0 0 20 20">
@@ -28,38 +17,91 @@ const StarIcon = () => (
 );
 
 export default function Depoimentos() {
+  const [depoimentos, setDepoimentos] = useState<Depoimento[]>([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  const fetchDepoimentos = async () => {
+    setLoading(true);
+    try {
+      const q = query(
+        collection(db, 'depoimentos'),
+        where('aprovado', '==', true),
+        orderBy('dataCriacao', 'desc')
+      );
+      const querySnapshot = await getDocs(q);
+      const fetched: Depoimento[] = [];
+      querySnapshot.forEach((doc) => {
+        fetched.push({ id: doc.id, ...doc.data() } as Depoimento);
+      });
+      setDepoimentos(fetched);
+    } catch (error) {
+      console.error("Erro ao buscar depoimentos:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchDepoimentos();
+  }, []);
+
   return (
     <section className="w-full bg-slate-50 py-16 px-6 flex flex-col items-center">
       <div className="max-w-6xl w-full">
-        <h3 className="text-3xl font-bold text-center mb-12 text-[var(--color-medium-accent-blue)]">
-          O que dizem nossos viajantes
-        </h3>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {depoimentos.map((depoimento) => (
-            <div 
-              key={depoimento.id} 
-              className="bg-white rounded-2xl shadow-md p-8 flex flex-col h-full hover:shadow-lg transition-shadow"
-            >
-              <div className="flex gap-1 mb-4">
-                {[...Array(depoimento.estrelas)].map((_, i) => (
-                  <StarIcon key={i} />
-                ))}
-              </div>
-              
-              <p className="italic text-gray-600 mb-6 flex-1 text-lg leading-relaxed">
-                "{depoimento.texto}"
-              </p>
-              
-              <div className="mt-auto">
-                <p className="font-bold text-gray-800 text-lg">
-                  {depoimento.nome}
-                </p>
-              </div>
-            </div>
-          ))}
+        <div className="flex flex-col sm:flex-row justify-between items-center mb-12 gap-4">
+          <h3 className="text-3xl font-bold text-center text-[var(--color-medium-accent-blue)]">
+            O que dizem nossos viajantes
+          </h3>
+          <button 
+            onClick={() => setIsModalOpen(true)}
+            className="bg-[var(--color-primary-accent)] hover:bg-orange-500 text-white font-bold py-3 px-6 rounded-xl transition-colors shadow-sm"
+          >
+            Deixar meu Depoimento
+          </button>
         </div>
+        
+        {loading ? (
+          <p className="text-center text-gray-500 text-lg">Carregando depoimentos...</p>
+        ) : depoimentos.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {depoimentos.map((depoimento) => (
+              <div 
+                key={depoimento.id} 
+                className="bg-white rounded-2xl shadow-md p-8 flex flex-col h-full hover:shadow-lg transition-shadow"
+              >
+                <div className="flex gap-1 mb-4">
+                  {[...Array(depoimento.estrelas)].map((_, i) => (
+                    <StarIcon key={i} />
+                  ))}
+                </div>
+                
+                <p className="italic text-gray-600 mb-6 flex-1 text-lg leading-relaxed">
+                  "{depoimento.texto}"
+                </p>
+                
+                <div className="mt-auto">
+                  <p className="font-bold text-gray-800 text-lg">
+                    {depoimento.nome}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="text-center bg-white rounded-2xl shadow-md p-12">
+            <p className="text-gray-600 text-lg">
+              Nenhum depoimento ainda. Seja o primeiro a contar como foi viajar conosco!
+            </p>
+          </div>
+        )}
       </div>
+
+      <FormularioDepoimento 
+        isOpen={isModalOpen} 
+        onClose={() => setIsModalOpen(false)} 
+        onSuccess={fetchDepoimentos} 
+      />
     </section>
   );
 }
