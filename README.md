@@ -15,6 +15,10 @@ Um site moderno e dinâmico para uma agência de turismo, contando com uma vitri
 - Slideshow dinâmico na capa carregado diretamente do painel de administração.
 - Listagem de passeios em cards atrativos.
 - Modal de detalhes com informações completas e formatação amigável.
+- Seção dinâmica de Depoimentos, com envio de feedback integrado ao Firestore.
+- Seção de Perguntas Frequentes (FAQ) em formato acordeão para quebra de objeções.
+- Rodapé profissional com dados jurídicos, de atendimento e navegação rápida.
+- Botão flutuante do WhatsApp para atendimento rápido e constante em todas as telas.
 - Redirecionamento direto para reserva via WhatsApp com mensagens pré-configuradas.
 
 ### Painel Admin (CMS)
