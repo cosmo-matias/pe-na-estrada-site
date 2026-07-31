@@ -7,7 +7,7 @@ const faqData = [
   },
   {
     pergunta: "Como funcionam os locais de embarque?",
-    resposta: "Temos pontos fixos em Capim, Mamanguape, Sapé e João Pessoa. O local exato e o horário são alinhados após a reserva."
+    resposta: "Temos pontos fixos em Capim, Mamanguape, Cuité de Mamanguape, Olho D'água do Serrão, Sapé e João Pessoa. O local exato e o horário são alinhados após a reserva."
   },
   {
     pergunta: "Posso cancelar minha reserva?",
