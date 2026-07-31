@@ -182,6 +182,16 @@ export default function Home() {
                     alt={`Foto de ${passeio.titulo}`}
                     className="object-cover w-full h-full hover:scale-105 transition-transform duration-500"
                   />
+                  {/* Gatilhos de Escassez */}
+                  {passeio.vagas <= 0 ? (
+                    <span className="absolute top-3 right-3 bg-gray-800/90 backdrop-blur-sm text-white text-xs font-bold px-3 py-1 rounded-full uppercase shadow-lg border border-gray-700">
+                      Esgotado
+                    </span>
+                  ) : passeio.vagas > 0 && passeio.vagas <= 5 ? (
+                    <span className="absolute top-3 right-3 bg-red-600 text-white text-xs font-bold px-3 py-1 rounded-full uppercase shadow-lg animate-pulse border border-red-800">
+                      Últimas Vagas
+                    </span>
+                  ) : null}
                 </div>
                 {/* Conteúdo */}
                 <div className="p-8 flex-1 flex flex-col bg-[var(--color-light-bg-white)]">
@@ -209,14 +219,20 @@ export default function Home() {
                     </button>
                   </div>
                   {/* Botão de Ação CTA */}
-                  <a
-                    href={`https://wa.me/5583993620038?text=Olá! Gostaria de reservar o passeio para ${encodeURIComponent(passeio.titulo)}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="block w-full text-center bg-[var(--color-primary-accent)] hover:bg-orange-500 text-white font-bold py-3 px-4 rounded-xl transition-colors shadow-sm hover:shadow-md"
-                  >
-                    Reservar via WhatsApp
-                  </a>
+                  {passeio.vagas <= 0 ? (
+                    <div className="block w-full text-center bg-gray-400 cursor-not-allowed text-white font-bold py-3 px-4 rounded-xl shadow-sm">
+                      Esgotado
+                    </div>
+                  ) : (
+                    <a
+                      href={`https://wa.me/5583993620038?text=Olá! Gostaria de reservar o passeio para ${encodeURIComponent(passeio.titulo)}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="block w-full text-center bg-[var(--color-primary-accent)] hover:bg-orange-500 text-white font-bold py-3 px-4 rounded-xl transition-colors shadow-sm hover:shadow-md"
+                    >
+                      Reservar via WhatsApp
+                    </a>
+                  )}
                 </div>
                   </div>
                 ))}
