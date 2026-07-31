@@ -11,6 +11,7 @@ import InstagramBanner from "@/components/InstagramBanner";
 import BarraBusca from "@/components/BarraBusca";
 import TimelineRoteiro from "@/components/TimelineRoteiro";
 import ChecklistPasseio from "@/components/ChecklistPasseio";
+import CaptacaoLeads from "@/components/CaptacaoLeads";
 
 // Definindo a interface para o Passeio
 interface Passeio {
@@ -249,6 +250,9 @@ export default function Home() {
 
       {/* FAQ */}
       <Faq />
+
+      {/* Captação de Leads */}
+      <CaptacaoLeads />
 
       {/* Instagram Banner */}
       <InstagramBanner />
