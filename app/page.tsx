@@ -9,6 +9,7 @@ import Depoimentos from "@/components/Depoimentos";
 import Faq from "@/components/Faq";
 import InstagramBanner from "@/components/InstagramBanner";
 import BarraBusca from "@/components/BarraBusca";
+import TimelineRoteiro from "@/components/TimelineRoteiro";
 
 // Definindo a interface para o Passeio
 interface Passeio {
@@ -300,6 +301,16 @@ export default function Home() {
               
               <div className="mb-8 text-[var(--color-dark-base)]/90 whitespace-pre-wrap leading-relaxed">
                 {passeioSelecionado.descricao}
+              </div>
+
+              <h4 className="text-lg font-bold text-gray-800 mt-6 mb-4">Programação do Dia</h4>
+              <div className="mb-8">
+                <TimelineRoteiro roteiro={[
+                  { horario: '05:00', evento: 'Embarque Principal' },
+                  { horario: '08:30', evento: 'Parada para Café da Manhã' },
+                  { horario: '09:30', evento: 'Chegada ao Destino e Início dos Passeios' },
+                  { horario: '16:00', evento: 'Retorno' }
+                ]} />
               </div>
               
               <a
