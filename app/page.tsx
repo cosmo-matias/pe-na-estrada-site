@@ -5,6 +5,7 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 import { collection, query, where, getDocs } from "firebase/firestore";
 import { db } from "@/lib/firebaseConfig";
+import Depoimentos from "@/components/Depoimentos";
 
 // Definindo a interface para o Passeio
 interface Passeio {
@@ -187,6 +188,9 @@ export default function Home() {
           </div>
         )}
       </section>
+
+      {/* Depoimentos */}
+      <Depoimentos />
 
       {/* Rodapé Minimalista */}
       <footer className="w-full bg-[var(--color-dark-base)] py-8 flex flex-col items-center justify-center border-t border-[var(--color-medium-accent-blue)]/30">
