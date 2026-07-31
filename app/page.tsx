@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { collection, query, where, getDocs } from "firebase/firestore";
 import { db } from "@/lib/firebaseConfig";
 import Depoimentos from "@/components/Depoimentos";
+import Faq from "@/components/Faq";
 
 // Definindo a interface para o Passeio
 interface Passeio {
@@ -191,6 +192,9 @@ export default function Home() {
 
       {/* Depoimentos */}
       <Depoimentos />
+
+      {/* FAQ */}
+      <Faq />
 
 
 
