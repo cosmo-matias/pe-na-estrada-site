@@ -8,6 +8,7 @@ import { db } from "@/lib/firebaseConfig";
 import Depoimentos from "@/components/Depoimentos";
 import Faq from "@/components/Faq";
 import InstagramBanner from "@/components/InstagramBanner";
+import BarraBusca from "@/components/BarraBusca";
 
 // Definindo a interface para o Passeio
 interface Passeio {
@@ -25,6 +26,10 @@ export default function Home() {
   const [passeios, setPasseios] = useState<Passeio[]>([]);
   const [loading, setLoading] = useState(true);
   const [passeioSelecionado, setPasseioSelecionado] = useState<Passeio | null>(null);
+
+  // Estados de busca
+  const [searchText, setSearchText] = useState("");
+  const [selectedMonth, setSelectedMonth] = useState("");
 
   // Estados para o slideshow
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -86,6 +91,20 @@ export default function Home() {
     return new Intl.DateTimeFormat('pt-BR').format(date);
   };
 
+  // Filtragem
+  const passeiosFiltrados = passeios.filter((passeio) => {
+    const matchText = passeio.titulo.toLowerCase().includes(searchText.toLowerCase()) || 
+                      passeio.descricao.toLowerCase().includes(searchText.toLowerCase());
+    
+    let matchMonth = true;
+    if (selectedMonth !== "") {
+      const mesPasseio = passeio.data.split('-')[1]; // Assume formato YYYY-MM-DD
+      matchMonth = mesPasseio === selectedMonth;
+    }
+    
+    return matchText && matchMonth;
+  });
+
   return (
     <main className="flex min-h-screen flex-col items-center justify-between">
       {/* Hero Section */}
@@ -136,9 +155,23 @@ export default function Home() {
              <p className="text-xl font-medium text-[var(--color-dark-base)]">Novos passeios em breve! Fique de olho.</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 w-full max-w-6xl">
-            {passeios.map((passeio) => (
-              <div key={passeio.id} className="bg-[var(--color-pale-peach)] rounded-3xl overflow-hidden shadow-md flex flex-col hover:shadow-xl transition-shadow min-h-[450px]">
+          <div className="w-full max-w-6xl flex flex-col items-center">
+            <div className="w-full max-w-3xl">
+              <BarraBusca 
+                searchText={searchText}
+                onSearchTextChange={setSearchText}
+                selectedMonth={selectedMonth}
+                onMonthChange={setSelectedMonth}
+              />
+            </div>
+            {passeiosFiltrados.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-12">
+                <p className="text-xl font-medium text-[var(--color-dark-base)]">Nenhum passeio encontrado para esta busca.</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 w-full">
+                {passeiosFiltrados.map((passeio) => (
+                  <div key={passeio.id} className="bg-[var(--color-pale-peach)] rounded-3xl overflow-hidden shadow-md flex flex-col hover:shadow-xl transition-shadow min-h-[450px]">
                 {/* Imagem (usando tag img para evitar problemas de configuração de domínio remoto no next/image) */}
                 <div 
                   className="h-64 w-full relative bg-gray-100 cursor-pointer overflow-hidden"
@@ -185,8 +218,10 @@ export default function Home() {
                     Reservar via WhatsApp
                   </a>
                 </div>
+                  </div>
+                ))}
               </div>
-            ))}
+            )}
           </div>
         )}
       </section>
