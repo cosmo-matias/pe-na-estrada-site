@@ -192,20 +192,7 @@ export default function Home() {
       {/* Depoimentos */}
       <Depoimentos />
 
-      {/* Rodapé Minimalista */}
-      <footer className="w-full bg-[var(--color-dark-base)] py-8 flex flex-col items-center justify-center border-t border-[var(--color-medium-accent-blue)]/30">
-        <div className="flex gap-6 mb-4">
-          <Link href="https://instagram.com/penaestradatour7" target="_blank" rel="noopener noreferrer" className="text-[var(--color-light-bg-white)] hover:text-[var(--color-primary-accent)] transition-colors">
-            Instagram
-          </Link>
-          <Link href="https://wa.me/5583993620038" target="_blank" rel="noopener noreferrer" className="text-[var(--color-light-bg-white)] hover:text-[var(--color-primary-accent)] transition-colors">
-            WhatsApp
-          </Link>
-        </div>
-        <p className="text-sm text-[var(--color-light-bg-white)]/60 text-center">
-          © {new Date().getFullYear()} Pé Na Estrada Tour. Todos os direitos reservados.
-        </p>
-      </footer>
+
 
       {/* Modal de Detalhes do Passeio */}
       {passeioSelecionado && (
