@@ -3,7 +3,7 @@ import React from 'react';
 const faqData = [
   {
     pergunta: "Crianças pagam o valor integral?",
-    resposta: "Crianças de colo não pagam a passagem no transporte. No entanto, alguns passeios possuem ingressos locais, portanto, é necessário consultar-nos via WhatsApp para verificar se haverá cobrança de ingresso para a criança no roteiro escolhido."
+    resposta: "Crianças de colo (até 3 anos) não pagam a passagem no transporte. No entanto, alguns passeios possuem ingressos locais, portanto, é necessário consultar-nos via WhatsApp para verificar se haverá cobrança de ingresso para a criança no roteiro escolhido."
   },
   {
     pergunta: "Como funcionam os locais de embarque?",
