@@ -7,6 +7,7 @@ import { collection, query, where, getDocs } from "firebase/firestore";
 import { db } from "@/lib/firebaseConfig";
 import Depoimentos from "@/components/Depoimentos";
 import Faq from "@/components/Faq";
+import InstagramBanner from "@/components/InstagramBanner";
 
 // Definindo a interface para o Passeio
 interface Passeio {
@@ -195,6 +196,9 @@ export default function Home() {
 
       {/* FAQ */}
       <Faq />
+
+      {/* Instagram Banner */}
+      <InstagramBanner />
 
 
 
