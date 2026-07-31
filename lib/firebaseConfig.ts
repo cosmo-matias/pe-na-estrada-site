@@ -4,12 +4,12 @@ import { getFirestore } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
 
 const firebaseConfig = {
-  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
-  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
-  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
-  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
-  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
+  apiKey: "AIzaSyAiPPHK06XNgBKruXH8veC7tDx0SSr6PY8",
+  authDomain: "pe-na-estrada-tour.firebaseapp.com",
+  projectId: "pe-na-estrada-tour",
+  storageBucket: "pe-na-estrada-tour.firebasestorage.app",
+  messagingSenderId: "814607424540",
+  appId: "1:814607424540:web:2866f25c94627d21b6d3d9"
 };
 
 // Initialize Firebase only if not already initialized
