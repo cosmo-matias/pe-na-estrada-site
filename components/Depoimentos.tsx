@@ -8,6 +8,7 @@ interface Depoimento {
   nome: string;
   texto: string;
   estrelas: number;
+  dataCriacao?: string;
 }
 
 const StarIcon = () => (
@@ -26,14 +27,21 @@ export default function Depoimentos() {
     try {
       const q = query(
         collection(db, 'depoimentos'),
-        where('aprovado', '==', true),
-        orderBy('dataCriacao', 'desc')
+        where('aprovado', '==', true)
       );
       const querySnapshot = await getDocs(q);
       const fetched: Depoimento[] = [];
       querySnapshot.forEach((doc) => {
         fetched.push({ id: doc.id, ...doc.data() } as Depoimento);
       });
+      
+      // Ordenação feita no frontend para evitar a necessidade de criar um Índice Composto no Firestore
+      fetched.sort((a, b) => {
+        const dateA = a.dataCriacao ? new Date(a.dataCriacao).getTime() : 0;
+        const dateB = b.dataCriacao ? new Date(b.dataCriacao).getTime() : 0;
+        return dateB - dateA;
+      });
+      
       setDepoimentos(fetched);
     } catch (error) {
       console.error("Erro ao buscar depoimentos:", error);
