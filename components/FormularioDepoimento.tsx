@@ -66,7 +66,7 @@ export default function FormularioDepoimento({ isOpen, onClose, onSuccess }: For
               required
               value={nome}
               onChange={e => setNome(e.target.value)}
-              className="w-full px-4 py-2 rounded-xl border border-gray-300 focus:ring-2 focus:ring-[var(--color-primary-accent)] outline-none"
+              className="w-full px-4 py-2 rounded-xl border border-gray-300 focus:ring-2 focus:ring-[var(--color-primary-accent)] outline-none text-gray-900 placeholder-gray-500"
               placeholder="Ex: Mariana Silva"
             />
           </div>
@@ -76,7 +76,7 @@ export default function FormularioDepoimento({ isOpen, onClose, onSuccess }: For
             <select 
               value={estrelas}
               onChange={e => setEstrelas(Number(e.target.value))}
-              className="w-full px-4 py-2 rounded-xl border border-gray-300 focus:ring-2 focus:ring-[var(--color-primary-accent)] outline-none"
+              className="w-full px-4 py-2 rounded-xl border border-gray-300 focus:ring-2 focus:ring-[var(--color-primary-accent)] outline-none text-gray-900"
             >
               <option value={5}>5 - Excelente</option>
               <option value={4}>4 - Muito Bom</option>
@@ -92,7 +92,7 @@ export default function FormularioDepoimento({ isOpen, onClose, onSuccess }: For
               required
               value={texto}
               onChange={e => setTexto(e.target.value)}
-              className="w-full px-4 py-2 rounded-xl border border-gray-300 focus:ring-2 focus:ring-[var(--color-primary-accent)] outline-none min-h-[100px]"
+              className="w-full px-4 py-2 rounded-xl border border-gray-300 focus:ring-2 focus:ring-[var(--color-primary-accent)] outline-none min-h-[100px] text-gray-900 placeholder-gray-500"
               placeholder="Conte-nos um pouco sobre a sua experiência..."
             />
           </div>
